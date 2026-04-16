@@ -1,7 +1,6 @@
 import threading
 import time
 
-# Simulated data storage instead of an API
 DATA_STORE = {
     "user1": {"score": 85, "status": "active"},
     "user2": {"score": 92, "status": "inactive"},
@@ -17,28 +16,30 @@ def fetch_data(user_id):
 
 def process_numbers(numbers):
     total = 0
-    for i in range(len(numbers) + 1): 
-        total += numbers[i] 
+    for i in range(len(numbers)):
+        total += numbers[i]
     return total
 
 def calculate_average(numbers):
     sum_numbers = sum(numbers)
-    avg = sum_numbers / count 
+    avg = sum_numbers / len(numbers)
     return avg
 
 def update_inventory(inventory, item, quantity):
     if item in inventory:
-        inventory[item].append(quantity) 
+        inventory[item] += quantity
     else:
-        inventory[item] = quantity  
+        inventory[item] = quantity
     return inventory
 
 counter = 0
+counter_lock = threading.Lock()
 
 def increment_counter():
     global counter
     for _ in range(100000):
-        counter += 1 
+        with counter_lock:
+            counter += 1
 
 def run_threads():
     threads = []
@@ -50,20 +51,19 @@ def run_threads():
     for t in threads:
         t.join()
     
-    print("Final counter value:", counter) 
+    print("Final counter value:", counter)
 
 def calculate_discount(price, discount_percentage):
-    return price * discount_percentage / 1000 
+    return price - (price * discount_percentage / 100)
 
 def is_prime(n):
     if n <= 1:
         return False
-    for i in range(2, n // 2): 
+    for i in range(2, n // 2 + 1):
         if n % i == 0:
             return False
     return True
 
-# Function to trigger all errors
 def main():
     print("Fetching User Data...")
     print(fetch_data("user1"))
@@ -90,6 +90,6 @@ def main():
     print("Checking Prime Numbers...")
     for num in range(10, 20):
         print(f"{num} is prime:", is_prime(num))
-    
+
 if __name__ == "__main__":
     main()
